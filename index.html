@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+<style>
+</style>
+<meta charset="utf-8">
+<title>Million Song Dataset</title>
+</head>
+
+<body>
+<script type="text/javascript" src="../lib/d3.v5.min.js"></script>
+<script>
+    var edgesFilePath = 'data/edges.csv';
+    var nodesFilePath = 'data/nodes.csv';
+    
+    Promise.all([
+        d3.dsv(",", edgesFilePath),
+        d3.dsv(",", nodesFilePath)
+    ]).then(allData => {
+        let edges = allData[0]
+        let nodes = allData[1]
+        console.log(edges.length, nodes.length)
+    }).catch(error => {
+        ready(error, null, null)
+    });
+    
+</script>
+</body>
+</html>
