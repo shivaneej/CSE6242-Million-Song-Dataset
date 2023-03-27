@@ -1,0 +1,4 @@
+.DS_Store
+
+# Excluding edges.csv because of large size
+data/edges.csv

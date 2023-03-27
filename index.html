@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <title>Million Song Dataset</title>
 </head>
-
+    <!-- Add a search bar/dropdown to select artist -->
 <body>
 <script type="text/javascript" src="../lib/d3.v5.min.js"></script>
 <script>
@@ -13,15 +13,60 @@
     var nodesFilePath = 'data/nodes.csv';
     
     Promise.all([
-        d3.dsv(",", edgesFilePath),
-        d3.dsv(",", nodesFilePath)
+        d3.dsv(",", edgesFilePath, function(edge) {
+            return {
+                source_artist_id: edge.source_artist_id,
+                target_artist_id: edge.target_artist_id,
+                priority: parseInt(edge.priority)
+            };
+        }),
+        d3.dsv(",", nodesFilePath, (node) => {
+            return {
+                artist_id: node.artist_id, 
+                artist_name: node.artist_name, 
+                avg_duration: parseFloat(node.avg_duration), 
+                avg_familiarity: parseFloat(node.avg_familiarity), 
+                avg_hotness: parseFloat(node.avg_hotttnesss), 
+                total_tracks: parseInt(node.total_tracks)
+            };
+        })
     ]).then(allData => {
-        let edges = allData[0]
-        let nodes = allData[1]
-        console.log(edges.length, nodes.length)
+        let edges = allData[0];
+        let nodes = allData[1];
+        console.log(edges.length, nodes.length);
+
+        // Display initial nodes of top artists to select from
+
+        // Show initial network of artist based on selected artist (How many neighbors to show in the beginning?)
+        var selectedArtist = nodes[0];
+
+        var artistNetwork = getArtistNetwork(edges, selectedArtist['artist_id']); // default 10 similar artists
+        console.log('selected artist is: ', selectedArtist);
+        console.log('similar artists are: ', artistNetwork);
+        
+        //Dynamic node size based on number of songs
+        
+        // Dynamic color of nodes (genre/pin?)
+
+        // Dynamic color and thickness of edges (based on collaboration?)
+
+        // Any other styling for selected node
+
     }).catch(error => {
         ready(error, null, null)
     });
+
+    /**
+     * To get the similar artist network from list of edges
+     * @param edges: array of all edges
+     * @param artist_id: id of the artist to find the network for
+     * @param count: number of similar artists to return sorted by priority
+     */
+    function getArtistNetwork(edges, artist_id, count = 10) {
+        return edges.filter(edge => edge['source_artist_id'] === artist_id)
+                .sort((edge1, edge2) => edge1['priority'] - edge2['priority'])
+                .slice(0, count);
+    }
     
 </script>
 </body>
