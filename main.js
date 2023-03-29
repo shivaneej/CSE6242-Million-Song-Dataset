@@ -12,6 +12,8 @@ const colors = {'SELECTED': '#E0538F', 'DEFAULT' : '#2E64A2' };
 
 const slider = document.getElementById("similar_count_slider");
 
+let tip = d3.tip().attr('class', 'd3-tip').attr("id", "tooltip");
+
 Promise.all([
     d3.dsv(",", edgesFilePath, function(edge) {
         return {
@@ -67,9 +69,24 @@ Promise.all([
 
     // Any other styling for selected node
 
+    // tooltip for nodes
+    tip.html(function(d) { 
+        return getTooltipStats(d);
+    });
+    graph.call(tip);
+
 }).catch(error => {
     console.log(error)
 });
+
+
+function getTooltipStats(hoveredNode) {
+    return "Artist Name: " + hoveredNode['artist_name'] + 
+    "<br> Average Duration: " + parseFloat(hoveredNode['avg_duration']).toFixed(2) + 
+    "<br> Average Hotness: " + parseFloat(hoveredNode['avg_hotness']).toFixed(2) + 
+    "<br> Average Familiarity: " + parseFloat(hoveredNode['avg_familiarity']).toFixed(2) + 
+    "<br> Total Tracks: " + hoveredNode['total_tracks'] ;
+}
 
 /**
  * To get the similar artist network from list of edges
@@ -134,7 +151,9 @@ function drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, numberNeigh
         .attr("r", (d) => radiusScale(d['total_tracks']))
         .attr("fill", (d) => {
             return (d['artist_id'] == selectedArtist['artist_id']) ? colors.SELECTED : colors.DEFAULT; 
-        });
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
     node.append("text")
         .attr("stroke", "black")
