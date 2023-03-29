@@ -14,7 +14,7 @@
 - [ ] Dynamic color and thickness of edges (based on collaboration?)
 - [x] Any other styling for selected node
 - [x] Slider for number of similar artists
-- [ ] Tooltip on hover on node
+- [x] Tooltip on hover on node
 
 ### Analysis
 
