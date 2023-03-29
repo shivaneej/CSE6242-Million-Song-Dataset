@@ -1,0 +1,27 @@
+path {
+    fill: none;
+    stroke: #666;
+    stroke-width: 2px;
+}
+.slider-container {
+    width: max-content;
+    position: relative;
+}
+
+.slider-label {
+    position: absolute;
+    bottom: -10px;
+    font-size: 14px;
+}
+
+.slider-min {
+    left: 0;
+}
+
+.slider-max {
+    right: 0;
+}
+
+.slider {
+    width: -webkit-fill-available;
+}
