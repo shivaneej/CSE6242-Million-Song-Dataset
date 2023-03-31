@@ -88,6 +88,33 @@ Promise.all([
       })
     
     // Display initial nodes of top artists to select from
+    
+    var topDiv = d3.select("#top_artists");
+    var topArtistList = nodes.sort((a,b) => b.avg_familiarity - a.avg_familiarity); 
+    
+    var disc = topDiv
+                .selectAll(".disc")
+                .data(topArtistList.slice(0,9))
+                .enter()
+                .append("button")
+                .style("padding","5px")
+                .style("margin","5px")
+                .attr("id",(d)=> d.artist_id)
+                .attr("class","disc")
+                .on("click",function(d) {
+                    selectedArtist = allNodesMap[d.artist_id]
+
+                    clearGraph(graph);
+                    drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, sliderValue)
+                  });
+
+    disc.append("text")
+        .attr("stroke", "black")
+        .attr("font-size", "11px")
+        .attr("text-anchor", "middle")
+        .text(function(d) {
+            return d['artist_name'];
+    });
 
 
 

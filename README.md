@@ -6,13 +6,13 @@
 
 ### Visualization
 
-- [ ] Display initial nodes of top artists to select from
+- [x] Display initial nodes of top artists to select from
 - [x] Search artist to show
 - [x] Show initial network of artist (How many neighbors to show in the beginning?)
 - [x] Dynamic node size based on number of songs
 - [ ] Dynamic color of nodes (genre/pin?)
 - [ ] Dynamic color and thickness of edges (based on collaboration?)
-- [x] Any other styling for selected node
+- [ ] Any other styling for selected node
 - [x] Slider for number of similar artists
 - [x] Tooltip on hover on node
 
