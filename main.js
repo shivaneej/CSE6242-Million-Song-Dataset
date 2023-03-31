@@ -14,6 +14,8 @@ const slider = document.getElementById("similar_count_slider");
 
 let tip = d3.tip().attr('class', 'd3-tip').attr("id", "tooltip");
 
+const search = document.getElementById("search");
+
 Promise.all([
     d3.dsv(",", edgesFilePath, function(edge) {
         return {
@@ -50,19 +52,53 @@ Promise.all([
                 .attr("height", height - margins.top - margins.bottom)
                 .attr("transform", "translate( " + margins.left + ", "+ margins.top + ")");
 
-
-    // Display initial nodes of top artists to select from
-
     // Show initial network of artist based on selected artist (How many neighbors to show in the beginning?)
     var selectedArtist = nodes[0];
+    var sliderValue = 5;
+    drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, sliderValue);
 
+
+    // List of artists to display
     
-    drawNetworkGraph(graph, edges, allNodesMap, selectedArtist);
+    var selectTag = d3.select("select");
 
-    slider.addEventListener("input", function() {
+    var options = selectTag.selectAll('option')
+      .data(nodes.slice(0,10000));
+
+    options.enter()
+      .append('option')
+      .attr('value', function(d) {
+        return d.artist_name;
+      })
+      .attr('id',function(d){
+        return d.artist_id;
+      })
+      .text(function(d) {
+        return d.artist_name
+      });
+
+      search.addEventListener("click", function(){
+        var e = document.getElementById("artists")
+        var text = e.options[e.selectedIndex]
+        selectedArtist = allNodesMap[text.id]
+
         clearGraph(graph);
-        drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, this.value);
+        drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, sliderValue);
+
+      })
+    
+    // Display initial nodes of top artists to select from
+
+
+
+    //   Slider 
+    slider.addEventListener("input", function() {
+        sliderValue = this.value
+        clearGraph(graph);
+        drawNetworkGraph(graph, edges, allNodesMap, selectedArtist, sliderValue);
     });
+
+
     // Dynamic color of nodes (genre/pin?)
 
     // Dynamic color and thickness of edges (based on collaboration?)
@@ -74,6 +110,7 @@ Promise.all([
         return getTooltipStats(d);
     });
     graph.call(tip);
+
 
 }).catch(error => {
     console.log(error)

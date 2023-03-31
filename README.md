@@ -7,7 +7,7 @@
 ### Visualization
 
 - [ ] Display initial nodes of top artists to select from
-- [ ] Search artist to show
+- [x] Search artist to show
 - [x] Show initial network of artist (How many neighbors to show in the beginning?)
 - [x] Dynamic node size based on number of songs
 - [ ] Dynamic color of nodes (genre/pin?)

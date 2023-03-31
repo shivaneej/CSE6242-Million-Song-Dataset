@@ -34,3 +34,7 @@ path {
 .slider {
     width: -webkit-fill-available;
 }
+
+.select_artists{
+    width: 200px
+}
