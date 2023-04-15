@@ -8,7 +8,7 @@ var margins = { left: 50, right: 50, top: 50, bottom: 50 };
 var networkGraphWidth = width - margins.left - margins.right;
 var networkGraphHeight = height - margins.top - margins.bottom;
 var radiusScale = d3.scaleLinear().range([5, 25]);
-const colors = { 'SELECTED': '#E0538F', 'DEFAULT': '#2E64A2' };
+const colors = { 'SELECTED': '#E0538F', 'DEFAULT': '#2E64A2', 'EXPANDED': '#95D134'};
 var nodes, edges, allNodesMap, artistEdges;
 var sliderValue;
 var graphData, graph, selectedArtist, graphDataMap;
@@ -283,7 +283,9 @@ function drawGraph() {
             return radiusScale(d['total_tracks']);
         })
         .attr("fill", (d) => {
-            return (d['children'] != null) ? colors.SELECTED : colors.DEFAULT;
+            if (d['artist_id'] == selectedArtist['artist_id']) return colors.SELECTED;
+            else if (d['children'] != null) return colors.EXPANDED;
+            return colors.DEFAULT;
         })
 
 
