@@ -11,7 +11,9 @@ var radiusScale = d3.scaleLinear().range([5, 25]);
 const colors = { 'SELECTED': '#E0538F', 'DEFAULT': '#2E64A2', 'EXPANDED': '#95D134'};
 var nodes, edges, allNodesMap, artistEdges;
 var sliderValue;
-var graphData, graph, selectedArtist, graphDataMap;
+var graphData, graph, selectedArtist, graphDataMap, recommendationsDiv;
+var recommendations = [];
+var expandedArtists = [];
 var force;
 
 const slider = document.getElementById("similar_count_slider");
@@ -62,7 +64,9 @@ Promise.all([
         .attr("height", networkGraphHeight)
         .attr("transform", "translate( " + margins.left + ", " + margins.top + ")");
 
-
+    recommendationsDiv = d3.select("body")
+                           .append("div")
+                           .attr("id", "recommendations-div")
     // Show initial network of artist based on selected artist (How many neighbors to show in the beginning?)
     selectedArtist = nodes[0];
     sliderValue = 5;
@@ -70,6 +74,7 @@ Promise.all([
     fetchGraphData(selectedArtist);
     graphDataMap = buildGraphDataMap({});
     drawGraph();
+    displayRecommendations();
 
     // List of artists to display
     var selectTag = d3.select("select");
@@ -93,7 +98,7 @@ Promise.all([
         var e = document.getElementById("artists")
         var text = e.options[e.selectedIndex]
         selectedArtist = allNodesMap[text.id]
-
+        recommendations = [];
         clearGraph();
         fetchGraphData(selectedArtist);
         graphDataMap = buildGraphDataMap({});
@@ -116,10 +121,12 @@ Promise.all([
         .attr("class", "disc")
         .on("click", function (d) {
             selectedArtist = allNodesMap[d.artist_id]
+            recommendations = [];
             clearGraph();
             fetchGraphData(selectedArtist);
             graphDataMap = buildGraphDataMap({});
             drawGraph();
+            displayRecommendations();
         });
 
     disc.append("text")
@@ -132,11 +139,13 @@ Promise.all([
 
     //   Slider 
     slider.addEventListener("input", function () {
-        sliderValue = this.value
+        sliderValue = this.value;
+        recommendations = [];
         clearGraph();
         fetchGraphData(selectedArtist);
         graphDataMap = buildGraphDataMap({});
         drawGraph();
+        displayRecommendations();
     });
 
 
@@ -183,6 +192,7 @@ function fetchGraphData(selectedArtist) {
         var target = allNodesMap[edge['target']];
         graphData.push(target);
         selectedArtist.children.push(target);
+        recommendations.push(target);
     });
 }
 
@@ -302,11 +312,57 @@ function drawGraph() {
 }
 
 /**
+ * Function to display recommendations based on
+ * selected and expanded nodes.
+ */
+function displayRecommendations(){
+    const topRecommendations = {};
+    for (const artist of recommendations) {
+        if(artist != selectedArtist && expandedArtists.indexOf(artist) == -1){
+            artistName = artist["artist_name"];
+            topRecommendations[artistName] = topRecommendations[artistName] ? topRecommendations[artistName] + 1 : 1;
+        }
+    }
+    // Sort to get top 5 recommendations
+    var items = Object.keys(topRecommendations).map(function(key) {
+        return [key, topRecommendations[key]];
+    });
+    items.sort(function(first, second) {
+        return second[1] - first[1];
+    });
+    recommendationsToDisplay = items.slice(0, 5);
+    console.log(recommendationsToDisplay);
+    // TO DO: improve the display of 'recommendationsToDisplay' in UI
+    var recommendationsDiv = d3.select("#recommendations-div")
+    recommendationsDiv.selectAll("*").remove();
+    recommendationsDiv.append("h3")
+                      .text("Top-5 Artist Recommendations");
+    recommendationsDiv.append("table")
+                      .selectAll("tr")
+                      .data(recommendationsToDisplay)
+                      .enter()
+                      .append("tr")
+                      .append("td")
+                      .text(function(d){ return d[0]; });
+    console.log("out")
+}
+
+/**
  * Function to handle double click event of a node
  * @param d node that was clicked
  */
 function update(d) {
     if (d.children != null) {
+        var idx = expandedArtists.indexOf(d);
+        if (idx !== -1) {
+            expandedArtists.splice(idx, 1);
+        }
+        d.children.forEach(child => {
+            var index = recommendations.indexOf(child);
+            if (index !== -1) {
+                recommendations.splice(index, 1);
+            }
+        });
         let childrenToDelete = d.children.map(child => child['artist_id']);
         artistEdges = artistEdges.filter(edge => {
             return !(edge['source']['artist_id'] == d['artist_id'] && childrenToDelete.includes(edge['target']['artist_id']))
@@ -320,9 +376,11 @@ function update(d) {
         d.children = null;
         clearGraph();
         drawGraph();
+        displayRecommendations();
     }
     else {
         // get data of similar artists
+        expandedArtists.push(d);
         let newArtistEdges = getArtistNetwork(d['artist_id'], sliderValue);
         d.children = [];
         newArtistEdges.forEach(edge => {
@@ -331,10 +389,12 @@ function update(d) {
                 graphData.push(target);
             }
             d.children.push(target);
+            recommendations.push(target);
         });
         artistEdges = artistEdges.concat(newArtistEdges);
         graphDataMap = buildGraphDataMap(graphDataMap);
         clearGraph();
         drawGraph();
+        displayRecommendations();
     }
 }
