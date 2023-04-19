@@ -260,8 +260,9 @@ function clearGraph() {
  */
 function drawGraph() {
 
+   
 
-    // Set the colors for the links and circles for the top nodes
+  // Set the colors for the links and circles for the top nodes
   var topLinkColor = "yellow";
   var topCircleColor = "orange";
 
@@ -277,22 +278,21 @@ function drawGraph() {
         .force("charge", d3.forceManyBody().strength(-700))
         .alphaTarget(0.1)
         .on("tick", tick);
-/*  path = graph.append("g")
+
+   /*  path = graph.append("g")
         .selectAll("path")
         .data(artistEdges)
         .enter()
         .append("path") */
-        
         var nodes = force.nodes();
         var topNodes = nodes.sort((a, b) => b.total_tracks - a.total_tracks).slice(0, 5);
-
-
-    path = graph.append("g")
-        .selectAll("path")
-        .data(artistEdges)
-        .enter()
-        .append("path")
-        .attr("class", (d) => {
+        
+   path = graph.append("g")
+          .selectAll("path")
+          .data(artistEdges)
+          .enter()
+          .append("path")
+          .attr("class", (d) => {
             if (topNodes.includes(d.source) && topNodes.includes(d.target)) {
                   return "top-link"; // add a class for top nodes
               } else {
@@ -314,7 +314,8 @@ function drawGraph() {
         .on("dblclick", update)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
- /*  node.append("circle")
+
+   /*  node.append("circle")
         .attr("id", function (d) {
             return d.id;
         })
@@ -326,24 +327,26 @@ function drawGraph() {
             else if (d['children'] != null) return colors.EXPANDED;
             return colors.DEFAULT;
         }) */
-    nnode.append("circle")
-    .attr("id", function(d) {
-      return d.id;
-    })
-    .attr("r", function(d) {
-      return radiusScale(d.total_tracks);
-    })
-    .attr("fill", (d) => {
-      if (topNodes.includes(d)) {
-        return topCircleColor;
-      } else if (d['artist_id'] == selectedArtist['artist_id']) {
-        return colors.SELECTED;
-      } else if (d['children'] != null) {
-        return colors.EXPANDED;
-      } else {
-        return colors.DEFAULT;
-      }
-    });
+
+        node.append("circle")
+        .attr("id", function(d) {
+          return d.id;
+        })
+        .attr("r", function(d) {
+          return radiusScale(d.total_tracks);
+        })
+        .attr("fill", (d) => {
+          if (topNodes.includes(d)) {
+            return topCircleColor;
+          } else if (d['artist_id'] == selectedArtist['artist_id']) {
+            return colors.SELECTED;
+          } else if (d['children'] != null) {
+            return colors.EXPANDED;
+          } else {
+            return colors.DEFAULT;
+          }
+        });
+
 
 
     node.append("text")
