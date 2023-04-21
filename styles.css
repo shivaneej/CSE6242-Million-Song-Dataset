@@ -38,3 +38,13 @@ path {
 .select_artists{
     width: 200px
 }
+
+.top-link {
+    stroke: rgb(51, 0, 255);
+    /* add any other styles you want to apply to top links */
+ }
+ 
+ .default-link {
+    stroke: black;
+    /* add any other styles you want to apply to default links */
+ }
